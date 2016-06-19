@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+	<title>微信历史订单</title>
+	<link rel="icon" type="image/png" href="/static/jslib/amazeui/i/favicon.png">
+	<link rel="stylesheet" href="/static/jslib/amazeui/css/amazeui.min.css">
+	<link rel="stylesheet" href="/static/jslib/amazeui/css/app.css">
+	<script src="/static/jslib/amazeui/js/jquery.min.js"></script>
+	<script src="/static/jslib/amazeui/js/amazeui.min.js"></script>
+	<script src="/static/jslib/avalon1.5/avalon.js"></script>
+
+	<script>
+		avalon.ready(function () {
+			avalon.config({
+				interpolate: ["[[","]]"]
+			})
+			//全局VM
+			var bodyVM = avalon.define({
+				$id: 'body',
+				list:[]
+			});
+
+			avalon.scan();
+
+			var _tempstr = window.localStorage.getItem('ZZPOST');
+			if (_tempstr.indexOf(',')==-1){
+				// 没有用户信息就退出
+				return false;
+			}else{
+				//有用户信息则构造查询url
+			}
+			_tempstr = _tempstr.split(',');
+			var username = _tempstr[0];
+			var phone = _tempstr[1];
+			console.log('/orderlist_json?username='+username+'&phone='+phone);
+			$.getJSON('/orderlist_json?username='+username+'&phone='+phone, function(result){
+				console.log(result);
+				if (result.status==-1){
+					// 错误则显示错误信息
+					alert(result.error_message);
+				}else{
+
+					// 查询结果赋予到list
+					bodyVM.list = JSON.parse(result.order)
+					/*
+					var _tempJSON = JSON.parse(result.order);
+					for (var i in _tempJSON){
+						bodyVM.list.push({
+							'time':_tempJSON[i].fields.submitTime,
+							'address':_tempJSON[i].fields.fromAddress,
+							'status':_tempJSON[i].fields.status
+						});
+					}*/
+					console.log(bodyVM.list);
+
+				}
+			});
+
+		});
+	</script>
+</head>
+<body>
+<!--顶部Header-->
+<style>
+	header.am-header {
+		box-shadow: 0 1px 3px #C2C2C2;
+	}
+
+	.am-header > .am-header-left > a {
+		/*color: #4EC585;*/
+	}
+
+	.am-header > .am-header-title > a {
+		/*color: #000;*/
+	}
+
+	.am-header-default {
+		/*background-color: #FFF;*/
+	}
+</style>
+<header data-am-widget="header"
+		class="am-header am-header-default">
+	<div class="am-header-left am-header-nav">
+		<a href="/order" class="">
+			<i class="am-header-icon am-icon-angle-left"></i>
+		</a>
+	</div>
+
+	<h1 class="am-header-title">
+		<a href="#title-link" class="">
+			历史订单
+		</a>
+	</h1>
+
+	<!--<div class="am-header-right am-header-nav">-->
+	<!--<a href="#right-link" class="">-->
+	<!--<i class="am-header-icon am-icon-bars"></i>-->
+	<!--</a>-->
+	<!--</div>-->
+</header>
+<!--/顶部Header-->
+
+<!--主要内容区-->
+<style>
+	#main-section {
+		/*background-color: #f7f7f7;*/
+	}
+
+</style>
+
+<div id="main-section" ms-controller="body">
+	<table class="am-table">
+		<thead>
+		<tr>
+			<th>下单时间</th>
+			<th>取货地点</th>
+			<th>状态</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr ms-repeat-unit="list">
+			<td>[[unit.fields.submitTime.substring(0,19)]]</td>
+			<td>[[unit.fields.fromAddress]]</td>
+			<td>[[unit.fields.status]]</td>
+		</tr>
+		</tbody>
+	</table>
+
+</div>
+<!--/主要内容区-->
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+	<title>微信下单</title>
+	<link rel="icon" type="image/png" href="/static/jslib/amazeui/i/favicon.png">
+	<link rel="stylesheet" href="/static/jslib/amazeui/css/amazeui.min.css">
+	<link rel="stylesheet" href="/static/jslib/amazeui/css/app.css">
+	<script src="/static/jslib/amazeui/js/jquery.min.js"></script>
+	<script src="/static/jslib/amazeui/js/amazeui.min.js"></script>
+	<script src="/static/jslib/avalon1.5/avalon.js"></script>
+</head>
+<body>
+<!--顶部Header-->
+<style>
+	header.am-header {
+		box-shadow: 0 1px 3px #C2C2C2;
+	}
+
+	.am-header > .am-header-left > a {
+		color: #4EC585;
+	}
+
+	.am-header > .am-header-title > a {
+		color: #000;
+	}
+
+	.am-header-default {
+		background-color: #FFF;
+	}
+</style>
+<header data-am-widget="header" class="am-header am-header-default">
+	<!--<div class="am-header-left am-header-nav">
+		<a href="#left-link" class="">
+			<i class="am-header-icon am-icon-angle-left"></i>
+		</a>
+	</div>-->
+
+	<h1 class="am-header-title">
+		<a href="#title-link" class="">
+			微信下单
+		</a>
+	</h1>
+
+	<div class="am-header-right am-header-nav">
+		<a href="/orderlist" class="">
+			查询
+		</a>
+	</div>
+</header>
+<!--/顶部Header-->
+
+<!--主要内容区-->
+<style>
+	#main-section {
+		background-color: #f7f7f7;
+	}
+
+	.am-form {
+
+	}
+
+	.am-form i.am-icon-fw {
+		width: 4em;
+	}
+
+	.am-form input.am-form-field {
+		text-indent: 4em;
+	}
+
+	.am-form .am-form-group {
+		margin-bottom: 0;
+	}
+
+	.am-form .am-form-group:first-child input.am-form-field {
+		border-top: 1px solid #ccc;
+	}
+
+	.am-form .am-form-group input.am-form-field {
+		border-top: 0;
+	}
+
+	.am-form .am-btn-primary {
+		margin-top: 2em;
+		background-color: #22c7f7;
+		border: 1px solid #22c7f7;
+	}
+
+	#desc-text {
+		padding: 1em;
+		line-height: 150%;
+		color: #8a8a8a;
+	}
+</style>
+
+<div id="main-section">
+	<div id="desc-text">
+		欢迎使用邮政在线快递系统<br>
+		想在任何地方都能轻松的发送EMS吗？<br>
+		现在提交您的手机号，我们会在1-2小时内联系您:)
+	</div>
+
+	<form action="" class="am-form">
+		<div class="am-form-group am-form-icon">
+			<i class="am-icon-fw">
+				&nbsp;姓&nbsp;名
+			</i>
+			<input type="text" id="username" name="username" class="am-form-field" placeholder="您希望我们怎么称呼您">
+		</div>
+
+		<div class="am-form-group am-form-icon">
+			<i class="am-icon-fw">
+				&nbsp;手&nbsp;机
+			</i>
+			<input type="text" id="phone" name="phone" class="am-form-field" placeholder="请输入您的手机号">
+		</div>
+		<div class="am-form-group am-form-icon">
+			<i class="am-icon-fw">
+				&nbsp;取货点
+			</i>
+			<input type="text" id="fromaddress" name="fromaddress" class="am-form-field" placeholder="请输入需要上门取货的地址">
+		</div>
+		<span id="btn-submit" class="am-btn am-btn-primary am-btn-block">提&nbsp;交</span>
+	</form>
+
+</div>
+<!--/主要内容区-->
+
+<script>
+	$('#btn-submit').click(function () {
+		var errMsg = '';
+		if ($('#username').val() == '') {
+			errMsg += '请填写您的称呼\n';
+		}
+		if ($('#phone').val() == '') {
+			errMsg += '请输入您的联系手机\n';
+		}
+		if ($('#fromaddress').val() == '') {
+			errMsg += '请填写上门取货的地点\n';
+		}
+		if (errMsg != '') {
+			alert(errMsg + '请您填写完必须的信息后再提交！');
+			return false;
+		}
+		var postStr = '?username=' + $('#username').val() + '&phone=' + $('#phone').val() + '&fromaddress=' + $('#fromaddress').val();
+		$.getJSON('/order_json' + postStr, function (result) {
+			console.log(result);
+			// 提交失败
+			if (result.status == -1) {
+				alert('发生错误：\n' + result.error_message);
+			} else {
+				// 提交成功
+				alert('您的信息已成功保存，我们将尽快上门取货，请保持手机联系畅通');
+				//将用户名称和电话保存到localStorage中去
+				window.localStorage.setItem('ZZPOST', $('#username').val() + ',' + $('#phone').val());
+			}
+		});
+	});
+</script>
+</body>
+</html>
